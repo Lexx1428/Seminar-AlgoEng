@@ -1,4 +1,4 @@
-Seminar: Algorith Engineering
+Seminar: Algorithm Engineering
 
 
 
