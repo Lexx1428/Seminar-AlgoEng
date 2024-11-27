@@ -8,18 +8,24 @@ double opt_tilde(int n, double t, vector<double> weight, vector<double> profit) 
     
     
     vector<pair<double, int>> profit_weight_ratios(n);
-    for (int i = 0; i < n; ++i) {
-        profit_weight_ratios[i] = {profit[i] / weight[i], i};  // Store ratio and original index
+    for (int i = 0; i < n; i++) {
+        profit_weight_ratios[i] = {profit[i] / weight[i], i};  //store ratio and original index
     }
 
     sort(profit_weight_ratios.begin(), profit_weight_ratios.end(), greater<pair<double, int>>());
 
     double total_profit = 0.0;
     double total_weight = 0.0;  
-    for (int i = 0; i < n && total_weight + weight[profit_weight_ratios[i].second] <= t; ++i) {
-        int index = profit_weight_ratios[i].second;  
-        total_weight += weight[index];  
-        total_profit += profit[index];  
+    for (int i = 0; i < n; ++i) {
+        int index = profit_weight_ratios[i].second;
+        if (total_weight + weight[index] <= t) {    //if full item fits, take completely
+            total_weight += weight[index];
+            total_profit += profit[index];
+        } else {                                    //if not, then only a fraction
+            double remaining_capacity = t - total_weight;
+            total_profit += profit[index] * (remaining_capacity / weight[index]);
+            break; 
+        }
     }
 
     return total_profit;
