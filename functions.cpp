@@ -10,13 +10,14 @@ struct Item {
     int weight;
 };
 
-ostream& operator<<(ostream& os, const Item& item) {
+ostream& operator<<(ostream &os, const Item &item) {
     os << "Value: " << item.value << ", Weight: " << item.weight;
     return os;
 }
 
-vector<Item> generateDataset(int numItems, int maxWeight, int maxValue) {
+vector<Item> generateDataset(const int &numItems, const int &maxWeight, const int &maxValue) {
     vector<Item> items;
+    items.reserve(numItems);
     srand(time(0));    //seed for randomness
     for (int i = 0; i < numItems; ++i) {
         int weight = rand() % maxWeight + 1;
@@ -26,7 +27,7 @@ vector<Item> generateDataset(int numItems, int maxWeight, int maxValue) {
     return items;
 }
 
-void partitionGroups(const vector<Item>& items, vector<vector<Item>>& groups, int count_of_groups) {
+void partitionGroups(const vector<Item> &items, vector<vector<Item>> &groups, int count_of_groups) {
 
     size_t length = items.size();
     groups.resize(count_of_groups);
