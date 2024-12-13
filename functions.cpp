@@ -6,12 +6,13 @@
 using namespace std;
 
 struct Item {
+    int index;
     int value;
     int weight;
 };
 
 ostream& operator<<(ostream &os, const Item &item) {
-    os << "Value: " << item.value << ", Weight: " << item.weight;
+    os << "Index: " << item.index << ", Value: " << item.value << ", Weight: " << item.weight;
     return os;
 }
 
@@ -20,9 +21,10 @@ vector<Item> generateDataset(const int &numItems, const int &maxWeight, const in
     items.reserve(numItems);
     srand(time(0));    //seed for randomness
     for (int i = 0; i < numItems; ++i) {
+        int index = i;
         int weight = rand() % maxWeight + 1;
         int value = rand() % maxValue + 1;
-        items.push_back({value, weight});
+        items.push_back({index, value, weight});
     }
     return items;
 }
@@ -68,7 +70,7 @@ int main() {
 
     cout << "Generated dataset:" << endl;
     for (const auto& item : dataset) {
-        cout << "Value: " << item.value << ", Weight: " << item.weight << endl;
+        cout << "Index: " << item.index << ", Value: " << item.value << ", Weight: " << item.weight << endl;
     }
 
     cout << endl;
