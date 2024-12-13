@@ -3,15 +3,17 @@
 #include <cstdlib>
 #include <ctime>
 #include <fstream>
+#include <utility>
 using namespace std;
 
 struct Item {
+    int index;
     int value;
     int weight;
 };
 
 ostream& operator<<(ostream &os, const Item &item) {
-    os << "Value: " << item.value << ", Weight: " << item.weight;
+    os << "Index: " << item.index << ", Value: " << item.value << ", Weight: " << item.weight;
     return os;
 }
 
@@ -20,9 +22,10 @@ vector<Item> generateDataset(const int &numItems, const int &maxWeight, const in
     items.reserve(numItems);
     srand(time(0));    //seed for randomness
     for (int i = 0; i < numItems; ++i) {
+        int index = i;
         int weight = rand() % maxWeight + 1;
         int value = rand() % maxValue + 1;
-        items.push_back({value, weight});
+        items.push_back({index, value, weight});
     }
     return items;
 }
@@ -49,9 +52,36 @@ void partitionGroups(const vector<Item> &items, vector<vector<Item>> &groups, in
 }
 
 
+//compute subarray: D <- A[I;V], A monotone non-decreasing array
+//If there exist no index i ∈ I with A[i] ∈ V , then set D to the empty array. Otherwise,
+//let imin := min{i ∈ I : A[i] ∈ V } and imax := max{i ∈ I : A[i] ∈ V }, and set D to the
+//subarray A[imin . . . imax]. Note that since A is monotone, for every i ∈ {imin, . . . , imax} we
+//have A[i] ∈ V . Thus A[I; V ] returns the subarray of A with indices in I and values in V .
+vector<int> computeSubarray(const vector<int> &input, const pair<int, int> &indices, const pair<int, int> values) {
+    vector<int> subarray;
+    for (int i = indices.first; i < indices.second + 1; ++i) {
+        if (input[i]>= values.first && input[i] <= values.second) {
+            subarray.push_back(input[i]);
+        }
+    }
+    return subarray;
+}
+
+
+
 
 
 int main() {
+
+    vector<int> input = {1,2,3,4,5,6,7,8,9,10};
+    pair<int, int> indices = {3, 7};
+    pair<int,int> values = {5, 15};
+
+    vector<int> test_subarray = computeSubarray(input, indices, values);
+
+    for (auto i : test_subarray) {
+        cout << i << " " << endl;
+    }
 
     int number;
     int maxWeight;
@@ -68,7 +98,7 @@ int main() {
 
     cout << "Generated dataset:" << endl;
     for (const auto& item : dataset) {
-        cout << "Value: " << item.value << ", Weight: " << item.weight << endl;
+        cout << "Index: " << item.index << ", Value: " << item.value << ", Weight: " << item.weight << endl;
     }
 
     cout << endl;
