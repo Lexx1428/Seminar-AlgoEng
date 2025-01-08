@@ -14,25 +14,38 @@ struct Item {
 };
 
 // Function to compute an approximate optimal value using the greedy approach
-int computeTildeOPT(const vector<Item>& items, int t) {
-    vector<Item> sortedItems = items;
-    sort(sortedItems.begin(), sortedItems.end(), [](const Item& a, const Item& b) {
-        return (double)a.profit / a.weight > (double)b.profit / b.weight;
-    });
+double computeTildeOPT(int n, double t, vector<Item> items) {
+    
+    
+    vector<pair<double, int>> value_weight_ratios(n);
+    for (int i = 0; i < n; i++) {
+        value_weight_ratios[i] = {static_cast<double>(items[i].profit) / items[i].weight, i};  //store ratio and original index
+    }
 
-    int totalWeight = 0, totalProfit = 0;
-    for (const auto& item : sortedItems) {
-        if (totalWeight + item.weight <= t) {
-            totalWeight += item.weight;
-            totalProfit += item.profit;
+    sort(value_weight_ratios.begin(), value_weight_ratios.end(), greater<pair<double, int>>());
+
+    double total_value = 0.0;
+    double total_weight = 0.0;  
+    int i; 
+    for (i = 0; i < n; ++i) {
+        int index = value_weight_ratios[i].second;
+        if (total_weight + items[index].weight <= t) {  // If full item fits, take it completely
+            total_weight += items[index].weight;
+            total_value += items[index].profit;
         } else {
-            int remainingWeight = t - totalWeight;
-            totalProfit += (item.profit * remainingWeight) / item.weight;
-            break;
+            break;  // Stop when capacity is exceeded
         }
     }
-    return totalProfit;
+
+    // Include the whole (i* + 1)-th item if it exists
+    if (i < n) {  // Check if there is an (i* + 1)-th item
+        int index = value_weight_ratios[i].second;
+        total_value += items[index].profit;  // Add the full value of the (i* + 1)-th item
+    }
+
+    return total_value;
 }
+
 
 // Function to compute profit sequence
 vector<vector<int>> computeProfitSequence(const vector<Item>& items, int maxWeight, int maxProfit) {
@@ -107,7 +120,8 @@ vector<vector<int>> algorithm1(const vector<Item>& items, int t) {
         wMax = max(wMax, item.weight);
         pMax = max(pMax, item.profit);
     }
-    int opt = computeTildeOPT(items, t);
+    int opt = computeTildeOPT(items.size(),t ,items);
+    cout << "Approximate OPT: " << opt << endl;
 
     int q = log2(min(t / wMax, opt / pMax));
     if (q < 0) q = 0; // Ensure q is non-negative
@@ -159,14 +173,22 @@ vector<vector<int>> algorithm1(const vector<Item>& items, int t) {
     int finalPMin = max(opt - sqrt(opt * pMax), 0.0);
     int finalPMax = opt + sqrt(opt * pMax);
 
-    auto result = extractSubarray(Dq[0], finalWMin, finalWMax, finalPMin, finalPMax);
+    cout << "Final Weight Range: [" << finalWMin << ", " << finalWMax << "]" << endl;
+    cout << "Final Profit Range: [" << finalPMin << ", " << finalPMax << "]" << endl;
 
+    if (Dq[0].empty() || Dq[0][0].empty()) {
+        cout << "Root DP table D^0_1 is empty!" << endl;
+        return {};
+    }
+
+    auto result = extractSubarray(Dq[0], finalWMin, finalWMax, finalPMin, finalPMax);
     return result;
 }
 
+
 int main() {
     vector<Item> items = {{1, 3, 4}, {2, 2, 3}, {3, 4, 2}, {4, 4, 5}};
-    int t = 10;
+    int t = 6;
     auto result = algorithm1(items, t);
 
     cout << "C0_1[T;P]:" << endl;
