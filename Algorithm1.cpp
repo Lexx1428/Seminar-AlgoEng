@@ -187,19 +187,28 @@ vector<vector<int>> algorithm1(const vector<Item>& items, int t) {
 
 
 int main() {
-    vector<Item> items = {{1, 3, 4}, {2, 2, 3}, {3, 4, 2}, {4, 4, 5}};
+    vector<Item> items = {{1, 3, 10}, {2, 2, 3}, {3, 4, 2}, {4, 4, 5}};
     int t = 6;
     auto result = algorithm1(items, t);
 
-    cout << "C0_1[T;P]:" << endl;
-    for (const auto& row : result) {
-        for (const auto& value : row) {
-            if (value == INT_MIN)
-                cout << "-\t";
-            else
-                cout << value << "\t";
+    // Print the number of items in the result
+    cout << "Number of entries in the result: " << result.size() << endl;
+
+    // Check if the result is empty
+    if (result.empty()) {
+        cout << "No valid results found." << endl;
+    } else {
+        cout << "C0_1[T;P]:" << endl;
+        for (const auto& row : result) {
+            for (const auto& value : row) {
+                if (value == INT_MIN)
+                    cout << "-\t";
+                else
+                    cout << value << "\t";
+            }
+            cout << endl;
         }
-        cout << endl;
     }
+
     return 0;
 }
