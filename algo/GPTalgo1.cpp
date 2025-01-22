@@ -31,8 +31,8 @@ std::vector<Interval> computeIntervals(double base, double delta, double eta, in
     std::vector<Interval> intervals;
     for (int i = 0; i <= q; ++i) {
         double factor = std::pow(2, q - i);
-        double lower = base / factor - std::sqrt(delta / factor * eta);
-        double upper = base / factor + std::sqrt(delta / factor * eta);
+        double lower = base / factor - std::sqrt(delta / factor) * eta;
+        double upper = base / factor + std::sqrt(delta / factor) * eta;
         intervals.push_back({lower, upper});
     }
     return intervals;
@@ -95,7 +95,7 @@ void knapsackAlgorithm(const std::vector<Item>& items, double t) {
 }
 
 int main() {
-    std::vector<Item> items = {{3, 60}, {2, 100}, {4, 120}};
+    std::vector<Item> items = {{3, 20}, {2, 100}, {4, 30}};
     double t = 50.0;
 
     knapsackAlgorithm(items, t);
