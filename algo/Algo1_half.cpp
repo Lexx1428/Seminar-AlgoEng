@@ -97,8 +97,6 @@ vector<int> computeProfitSequence(vector<Item>& group, int capacity) {
         pSequence[k] = kSack(k, group);
     }
     return pSequence;
-    } 
-    return pSequence;
 }
 
 vector<int> computeSubarray(const vector<int> &input, const pair<int, int> &indices, const pair<int, int> values) {
