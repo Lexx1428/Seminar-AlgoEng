@@ -142,7 +142,7 @@ int computeTildeOPT(int n, double t, vector<Item> items) {
     return total_value;
 }
 
-vector<vector<Item>> Algo1_half(const vector<Item>& items, int t){
+vector<vector<int>> Algo1_half(const vector<Item>& items, int t){
     int n = items.size();
     int wMax = 0, pMax = 0;
     for (const auto& item : items) {
@@ -171,17 +171,29 @@ vector<vector<Item>> Algo1_half(const vector<Item>& items, int t){
     pair<int,int> weight_interval(WqMin,WqMax);
     pair<int,int> profit_interval(WqMin,WqMax);
 
-    vector<vector<Item>> Dq(numPartitions);
-    vector<vector<Item>> Cq(numPartitions);
+    vector<vector<int>> Dq(numPartitions);
+    vector<vector<int>> Cq(numPartitions);
+
+    cout << "1st" << endl;
 
     for (int j = 0; j < numPartitions; ++j) {
         Dq[j] = computeProfitSequence(groups[j], WqMax);
         Cq[j] = computeSubarray(Dq[j], weight_interval, profit_interval);
     } 
+    
+    cout << "Ende" << endl;
 
     return Cq;
 } 
 
+void print2DVector(const vector<vector<int>>& vec) {
+    for (const auto& row : vec) { // Iterate through each row
+        for (const auto& element : row) { // Iterate through each element in the row
+            cout << element << " ";
+        }
+        cout << endl; // Newline after each row
+    }
+}
 
 
 
@@ -209,5 +221,12 @@ int main() {
         {19, 4, 7},
         {20, 5, 9}
     };
+
+    vector<vector<int>> opt;
+    int t = 30;
+
+    opt = Algo1_half(items,t); 
+    print2DVector(opt);
+
 
 }
