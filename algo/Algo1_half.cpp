@@ -92,11 +92,11 @@ int kSack(int capacity, vector<Item>& items) {
 
 //function to compute profit sequence for one group, k = capacity
 vector<int> computeProfitSequence(vector<Item>& group, int capacity) {
-    vector<int> pSequence;
-    for (int k=0;k < capacity+1; ++k) {
+    vector<int> pSequence(capacity, 0);
+    for (int k=0;k <= capacity; ++k) {
         pSequence[k] = kSack(k, group);
-        return pSequence;
-    } 
+    }
+    return pSequence;
 }
 
 vector<int> computeSubarray(const vector<int> &input, const pair<int, int> &indices, const pair<int, int> values) {
@@ -163,8 +163,18 @@ vector<vector<int>> Algo1_half(const vector<Item>& items, int t){
     vector<vector<Item>> groups;
     partitionGroups(items, groups, numPartitions);
 
+    cout << groups.size() << endl;
+    cout << "Partitions = " << numPartitions << endl;
+
+    double error_margin = sqrt(double(deltaP / numPartitions)) ;
+
+    cout << "delta p = " << deltaP << endl;
+    cout << "delta w = " << deltaW << endl;
+    cout << "Without squareroot = " << deltaP / numPartitions << endl;
+    cout << "error margin = " << error_margin << endl;
+
     int WqMin = t / numPartitions - sqrt(deltaW / numPartitions) * eta;
-    int WqMax = t / numPartitions + sqrt(deltaW / numPartitions) * eta;
+    int WqMax = (t / numPartitions) ;
     int PqMin = opt / numPartitions - sqrt(deltaP / numPartitions) * eta;
     int PqMax = opt / numPartitions + sqrt(deltaP / numPartitions) * eta;
 
@@ -191,7 +201,7 @@ void print2DVector(const vector<vector<int>>& vec) {
         for (const auto& element : row) { // Iterate through each element in the row
             cout << element << " ";
         }
-        cout << endl; // Newline after each row
+        cout << "row"<< endl; // Newline after each row
     }
 }
 
@@ -200,33 +210,34 @@ void print2DVector(const vector<vector<int>>& vec) {
 int main() {
 
     vector<Item> items = {
-        {1, 5, 10},
-        {2, 8, 14},
-        {3, 6, 12},
-        {4, 7, 13},
-        {5, 9, 16},
-        {6, 4, 8},
-        {7, 10, 20},
-        {8, 5, 9},
-        {9, 8, 15},
-        {10, 6, 11},
-        {11, 12, 24},
-        {12, 7, 14},
-        {13, 5, 10},
-        {14, 8, 18},
-        {15, 9, 17},
-        {16, 10, 19},
-        {17, 6, 13},
-        {18, 7, 12},
-        {19, 4, 7},
-        {20, 5, 9}
+        {1, 20, 5},
+        {2, 18, 8},
+        {3, 14, 7},
+        {4, 10, 4},
+        {5, 24, 12},
+        {6, 16, 6},
+        {7, 12, 5},
+        {8, 22, 9},
+        {9, 18, 7},
+        {10, 26, 10},
+        {11, 30, 11},
+        {12, 15, 5},
+        {13, 17, 6},
+        {14, 19, 7},
+        {15, 13, 4},
+        {16, 20, 8},
+        {17, 21, 9},
+        {18, 25, 10},
+        {19, 27, 11},
+        {20, 28, 12}
     };
 
+    int t = 50;
     vector<vector<int>> opt;
-    int t = 30;
+    
 
     opt = Algo1_half(items,t); 
-    print2DVector(opt);
+    //print2DVector(opt);
 
 
 }
