@@ -92,7 +92,7 @@ int kSack(int capacity, vector<Item>& items) {
 
 //function to compute profit sequence for one group, k = capacity
 vector<int> computeProfitSequence(vector<Item>& group, int capacity) {
-    vector<int> pSequence(capacity, 0);
+    vector<int> pSequence(capacity+1, 0);
     for (int k=0;k <= capacity; ++k) {
         pSequence[k] = kSack(k, group);
     }
@@ -142,6 +142,20 @@ int computeTildeOPT(int n, double t, vector<Item> items) {
     return total_value;
 }
 
+vector<int> maxPlusConv(const vector<int> &a, const vector<int> &b) {
+    size_t n = a.size();
+    size_t m = b.size();
+
+    vector<int> c(n+m-1, 0);
+
+    for (size_t i = 0; i < n; ++i) {
+        for (size_t j = 0; j < m; ++j) {
+            c[i+j] = max(c[i+j], a[i] + b[j]);
+        }
+    }
+    return c;
+}
+
 vector<vector<int>> Algo1_half(const vector<Item>& items, int t){
     int n = items.size();
     int wMax = 0, pMax = 0;
@@ -186,7 +200,7 @@ vector<vector<int>> Algo1_half(const vector<Item>& items, int t){
 
     cout << "1st" << endl;
 
-    for (int j = 0; j < numPartitions; ++j) {
+    for (int j = 1; j < numPartitions+1; ++j) {
         Dq[j] = computeProfitSequence(groups[j], WqMax);
         Cq[j] = computeSubarray(Dq[j], weight_interval, profit_interval);
     } 
@@ -237,7 +251,7 @@ int main() {
     
 
     opt = Algo1_half(items,t); 
-    //print2DVector(opt);
+    print2DVector(opt);
 
 
 }
