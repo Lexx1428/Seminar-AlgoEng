@@ -19,6 +19,20 @@ struct KnapsackInstance {
     int capacity;
 };
 
+ostream& operator<<(ostream &os, const Item &item) {
+    os << ", Profit: " << item.profit << ", Weight: " << item.weight << " Ratio: " << item.profitToWeightRatio();
+    return os;
+}
+
+ostream& operator<<(ostream &os, const KnapsackInstance &Instance) {
+    os << "Capacity: " << Instance.capacity << endl;
+    for (const auto& item : Instance.items) {
+        os << item << endl;
+    }
+    return os;
+}
+
+
 KnapsackInstance reduceToBalanced(const KnapsackInstance& original) {
     vector<Item> sortedItems = original.items;
     sort(sortedItems.begin(), sortedItems.end(), [](const Item &a, const Item &b){
@@ -62,17 +76,17 @@ KnapsackInstance reduceToBalanced(const KnapsackInstance& original) {
 
     cout << "good items: " << endl;
     for (const auto& item : good) {
-        cout << "profit: " << item.profit << " weight: " << item.weight << " ratio: " << item.profitToWeightRatio() << endl;
+        cout << item << endl;
     }
 
     cout << "Medium items: " << endl;
     for (const auto& item : medium) {
-        cout << "profit: " << item.profit << " weight: " << item.weight << " ratio: " << item.profitToWeightRatio() << endl;
+        cout << item << endl;
     }
 
     cout << "bad items: " << endl;
     for (const auto& item : bad) {
-        cout << "profit: " << item.profit << " weight: " << item.weight << " ratio: " << item.profitToWeightRatio() << endl;
+        cout << item << endl;
     }
 
     int newCapacity = 0;
@@ -86,23 +100,16 @@ KnapsackInstance reduceToBalanced(const KnapsackInstance& original) {
 
 int main() {
 
-    KnapsackInstance test = {
-        {{10,20}, {20,30}, {30,60}, {50,90}},
-        50
-    };
-    cout << "original instance: " << endl;
-    for (const auto& item : test.items) {
-        cout << "profit: " << item.profit << " weight: " << item.weight << " ratio: " << item.profitToWeightRatio() << endl;
-    }
-    cout << "Original capacity: " << test.capacity << endl;
+    KnapsackInstance test = { {{10,20}, {20,30}, {30,60}, {50,90}},    50};
 
+
+    cout << test << endl;
+    
+    cout << "Reduced instance: " << endl;
     KnapsackInstance reduced = reduceToBalanced(test);
 
-    cout << "reduced instance: " << endl;
-    for (const auto& item : reduced.items) {
-        cout << "profit: " << item.profit << " weight: " << item.weight << " ratio: " << item.profitToWeightRatio() << endl;
-    }
-    cout << "reduced capacity: " << reduced.capacity << endl;
+    cout << reduced << endl;
+
 
 
 
