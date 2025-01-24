@@ -6,6 +6,7 @@
 #include <utility>
 #include <algorithm>
 #include <cmath>
+#include <random>
 using namespace std;
 
 struct Item {
@@ -194,17 +195,17 @@ vector<vector<int>> Algo1_half(const vector<Item>& items, int t){
     double error_margin = sqrt(double(deltaP / numPartitions)) ;
 
     cout << "delta p = " << deltaP << endl;
-    cout << "delta w = " << deltaW << endl;
+    cout << "delta w = " << deltaW << endl; 
     cout << "Without squareroot = " << deltaP / numPartitions << endl;
     cout << "error margin = " << error_margin << endl;
 
     int WqMin = t / numPartitions - sqrt(deltaW / numPartitions) * eta;
     int WqMax = t / numPartitions;
     int PqMin = opt / numPartitions - sqrt(deltaP / numPartitions) * eta;
-    int PqMax = opt / numPartitions + sqrt(deltaP / numPartitions) * eta;
+    int PqMax = opt / numPartitions;
 
-    pair<int,int> weight_interval(WqMin,WqMax);
-    pair<int,int> profit_interval(WqMin,WqMax);
+    pair<int,int> weight_interval(0,WqMax);
+    pair<int,int> profit_interval(0,PqMax);
 
     vector<vector<int>> Dq(numPartitions);
     vector<vector<int>> Cq(numPartitions);
@@ -214,10 +215,14 @@ vector<vector<int>> Algo1_half(const vector<Item>& items, int t){
 
     for (int j = 0; j < numPartitions; ++j) {
         Dq[j] = computeProfitSequence(groups[j], WqMax);
-        //Cq[j] = computeSubarray(Dq[j], weight_interval, profit_interval);
+        Cq[j] = computeSubarray(Dq[j], weight_interval, profit_interval);
         cout << "j = " << j << endl;
-    } 
+    }
+    cout << "Dq :" << endl; 
     print2DVector(Dq);
+
+    cout << "Cq :" << endl;
+    print2DVector(Cq);
     
     cout << "END PROFIT SEQ" << endl;
     cout << endl;
@@ -240,6 +245,31 @@ vector<vector<int>> Algo1_half(const vector<Item>& items, int t){
     return Dq;
 }
 
+vector<Item> generateBalancedKnapsackItems(int num_items, int max_profit, int max_weight, int knapsack_capacity) {
+    vector<Item> items;
+
+    // Set random seed for reproducibility
+    random_device rd;
+    mt19937 gen(rd());
+    uniform_int_distribution<> profit_dist(10, max_profit);
+    uniform_int_distribution<> weight_dist(1, max_weight);
+
+    // Generate items
+    for (int i = 0; i < num_items; ++i) {
+        int profit = profit_dist(gen);
+        int weight = weight_dist(gen);
+
+        // Ensure balanced profit-to-weight ratio
+        while (static_cast<double>(profit) / weight > 2.0 || static_cast<double>(profit) / weight < 0.5) {
+            profit = profit_dist(gen);
+            weight = weight_dist(gen);
+        }
+
+        items.push_back({i + 1, profit, weight});
+    }
+
+    return items;
+}
 
 
 
@@ -251,33 +281,17 @@ void printVectorItem(const vector<Item>& vec) {
 
 int main() {
 
-    vector<Item> items = {
-        {1, 20, 5},
-        {2, 18, 8},
-        {3, 14, 7},
-        {4, 10, 4},
-        {5, 24, 12},
-        {6, 16, 6},
-        {7, 12, 5},
-        {8, 22, 9},
-        {9, 18, 7},
-        {10, 26, 10},
-        {11, 30, 11},
-        {12, 15, 5},
-        {13, 17, 6},
-        {14, 19, 7},
-        {15, 13, 4},
-        {16, 20, 8},
-        {17, 21, 9},
-        {18, 25, 10},
-        {19, 27, 11},
-        {20, 28, 12}
-    };
+    const int num_items = 1000;
+    const int max_profit = 100;
+    const int max_weight = 50;
+    const int knapsack_capacity = 25000;
 
+    vector<Item> items = generateBalancedKnapsackItems(num_items, max_profit, max_weight, knapsack_capacity);
     int t = 50;
     vector<vector<int>> opt;
-    opt = Algo1_half(items,t);
+    opt = Algo1_half(items,knapsack_capacity);
 
+    cout << "OPT tilde = " << computeTildeOPT(num_items, knapsack_capacity, items) << endl;
 
 
 
