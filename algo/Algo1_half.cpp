@@ -156,6 +156,15 @@ vector<int> maxPlusConv(const vector<int> &a, const vector<int> &b) {
     return c;
 }
 
+void print2DVector(const vector<vector<int>>& vec) {
+    for (const auto& row : vec) { // Iterate through each row
+        for (const auto& element : row) { // Iterate through each element in the row
+            cout << element << " ";
+        }
+        cout << "row"<< endl; // Newline after each row
+    }
+}
+
 vector<vector<int>> Algo1_half(const vector<Item>& items, int t){
     int n = items.size();
     int wMax = 0, pMax = 0;
@@ -163,6 +172,8 @@ vector<vector<int>> Algo1_half(const vector<Item>& items, int t){
         wMax = max(wMax, item.weight);
         pMax = max(pMax, item.profit);
     }
+
+    cout << "pMax = " << pMax << endl; 
 
     int opt = computeTildeOPT(items.size(),t ,items);
     cout << "Approximate OPT: " << opt << endl;
@@ -188,7 +199,7 @@ vector<vector<int>> Algo1_half(const vector<Item>& items, int t){
     cout << "error margin = " << error_margin << endl;
 
     int WqMin = t / numPartitions - sqrt(deltaW / numPartitions) * eta;
-    int WqMax = (t / numPartitions) ;
+    int WqMax = t / numPartitions;
     int PqMin = opt / numPartitions - sqrt(deltaP / numPartitions) * eta;
     int PqMax = opt / numPartitions + sqrt(deltaP / numPartitions) * eta;
 
@@ -197,29 +208,46 @@ vector<vector<int>> Algo1_half(const vector<Item>& items, int t){
 
     vector<vector<int>> Dq(numPartitions);
     vector<vector<int>> Cq(numPartitions);
-
-    cout << "1st" << endl;
-
-    for (int j = 1; j < numPartitions+1; ++j) {
-        Dq[j] = computeProfitSequence(groups[j], WqMax);
-        Cq[j] = computeSubarray(Dq[j], weight_interval, profit_interval);
-    } 
     
-    cout << "Ende" << endl;
+    cout << endl;
+    cout << "START PROFIT SEQ" << endl;
 
-    return Cq;
-} 
+    for (int j = 0; j < numPartitions; ++j) {
+        Dq[j] = computeProfitSequence(groups[j], WqMax);
+        //Cq[j] = computeSubarray(Dq[j], weight_interval, profit_interval);
+        cout << "j = " << j << endl;
+    } 
+    print2DVector(Dq);
+    
+    cout << "END PROFIT SEQ" << endl;
+    cout << endl;
+    
+    cout << "START MAXCONV" << endl;
+    for (int level = q - 1; level >= 0; --level) {
+        vector<vector<int>> next_level_arrays((1 << level));
+        for (int j = 0; j < (1 << level); ++j) {
+            // Combine using max-plus convolution
+            vector<int> convolved = maxPlusConv(Dq[2 * j], Dq[2 * j + 1]);
 
-void print2DVector(const vector<vector<int>>& vec) {
-    for (const auto& row : vec) { // Iterate through each row
-        for (const auto& element : row) { // Iterate through each element in the row
-            cout << element << " ";
+            next_level_arrays[j] = convolved;
         }
-        cout << "row"<< endl; // Newline after each row
+        Dq = next_level_arrays;
     }
+    print2DVector(Dq);
+
+    cout << "END MAXCONV" << endl;
+
+    return Dq;
 }
 
 
+
+
+void printVectorItem(const vector<Item>& vec) {
+    for (const auto& element : vec) {
+        cout << element.index << " " << element.profit << " " << element.weight << endl;
+    }
+}
 
 int main() {
 
@@ -248,10 +276,9 @@ int main() {
 
     int t = 50;
     vector<vector<int>> opt;
-    
+    opt = Algo1_half(items,t);
 
-    opt = Algo1_half(items,t); 
-    print2DVector(opt);
+
 
 
 }
