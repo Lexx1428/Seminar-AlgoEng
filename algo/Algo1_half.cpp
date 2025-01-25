@@ -96,7 +96,7 @@ std::vector<int> computeSubarray(const std::vector<int> &input, const std::pair<
     std::vector<int> subarray;
 
     // Ensure the indices interval is within the bounds of the array.
-    int start = indices.first;
+    int start = std::max(0, indices.first);
     int end = std::min(indices.second, static_cast<int>(input.size()) - 1);
 
     for (int i = start; i <= end; ++i) {
@@ -258,9 +258,10 @@ vector<int> Algo1_half(const vector<Item>& items, int t){
         cout << "next level array length = " << next_level_arrays.size() << endl;
 
         for (int j = 0; j < (1 << level); ++j) {
-            cout << "Inside inner for loop, j = " << j << endl;
+            cout << "Inside inner for loop, j = " << j;
             vector<int> convolved = maxPlusConv(CCq[2 * j], CCq[2 * j + 1]);
-            /*vector<int> filtered = computeSubarray(convolved, Pl, Wl);
+            //vector<int> filtered = computeSubarray(convolved, Pl, Wl);
+            /*
             for (const auto& num: filtered){
                 cout << num << " ";
             }
@@ -271,11 +272,11 @@ vector<int> Algo1_half(const vector<Item>& items, int t){
  
             next_level_arrays[j] = convolved;
         }
+        cout << endl;
 
         // Safely update CCq
         CCq.clear();
         CCq = next_level_arrays; // Ensure no unexpected optimizations
-        cout << "After inner for loop" << endl;
     }
 
 
@@ -301,16 +302,14 @@ vector<int> Algo1_half(const vector<Item>& items, int t){
 
     //return CCq;
 
-    /*
+    
     cout << "CCq[0] : " << endl; 
     for(const auto& num : CCq[0]){
         cout << num << " ";
     }
-    */
-    cout << "before final assignment" << endl;
-    vector<int> final_opt = computeSubarray(CCq[0], interval_T, interval_P); 
 
-    cout << "before return";
+    vector<int> final_opt = computeSubarray(CCq[0], interval_T, interval_P); 
+;
     return final_opt;
 }
 
@@ -455,15 +454,15 @@ int main() {
     int t = 1000;
     vector<int> opt;
     
-    cout << "Inside main function : before calling algo " << endl;
 
     opt = Algo1_half(items,t);
 
+    /*
     for(const auto& elem : opt){
         cout << elem << " ";
     }
+    */
 
-    cout << "before opt tilde" ;
     cout << "OPT tilde = " << computeTildeOPT(100, t, items) << endl;
 
 }
