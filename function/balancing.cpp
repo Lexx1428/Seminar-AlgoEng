@@ -33,6 +33,26 @@ ostream& operator<<(ostream &os, const KnapsackInstance &Instance) {
 }
 
 
+int findWmax(const vector<Item>& items) {
+    int wmax = 0;
+    for (const auto& item : items) {
+        if (item.weight > wmax) {
+            wmax = item.weight;
+        }
+    }
+    return wmax;
+}
+
+int findPmax(const vector<Item>& items) {
+    int pmax = 0;
+    for (const auto& item : items) {
+        if (item.profit > pmax) {
+            pmax = item.profit;
+        }
+    }
+    return pmax;
+}
+
 KnapsackInstance reduceToBalanced(const KnapsackInstance& original) {
     vector<Item> sortedItems = original.items;
     sort(sortedItems.begin(), sortedItems.end(), [](const Item &a, const Item &b){
@@ -111,6 +131,11 @@ int main() {
 
 
     cout << test << endl;
+    int pmax = findPmax(test.items);
+    int wmax = findWmax(test.items);
+    cout << "Wmax = " << wmax << endl;
+    cout << "Pmax = " << pmax << endl;
+    cout << endl;
     
     KnapsackInstance reduced = reduceToBalanced(test);
 
