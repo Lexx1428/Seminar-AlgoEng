@@ -92,13 +92,19 @@ vector<int> computeProfitSequence(vector<Item>& group, int capacity) {
     return pSequence;
 }
 
-vector<int> computeSubarray(const vector<int> &input, const pair<int, int> &indices, const pair<int, int> values) {
-    vector<int> subarray;
-    for (int i = indices.first; i < indices.second + 1; ++i) {
-        if (input[i]>= values.first && input[i] <= values.second) {
+std::vector<int> computeSubarray(const std::vector<int> &input, const std::pair<int, int> &indices, const std::pair<int, int> &values) {
+    std::vector<int> subarray;
+
+    // Ensure the indices interval is within the bounds of the array.
+    int start = indices.first;
+    int end = std::min(indices.second, static_cast<int>(input.size()) - 1);
+
+    for (int i = start; i <= end; ++i) {
+        if (input[i] >= values.first && input[i] <= values.second) {
             subarray.push_back(input[i]);
         }
     }
+
     return subarray;
 }
 
@@ -157,7 +163,7 @@ void print2DVector(const vector<vector<int>>& vec) {
     }
 }
 
-vector<vector<int>> Algo1_half(const vector<Item>& items, int t){
+vector<int> Algo1_half(const vector<Item>& items, int t){
     int n = items.size();
     int wMax = 0, pMax = 0;
     for (const auto& item : items) {
@@ -166,7 +172,7 @@ vector<vector<int>> Algo1_half(const vector<Item>& items, int t){
     }
 
     cout << "pMax = " << pMax << endl; 
-
+    cout << "wMax = " << wMax << endl;
     int opt = computeTildeOPT(items.size(),t ,items);
     cout << "Approximate OPT: " << opt << endl;
 
@@ -225,10 +231,13 @@ vector<vector<int>> Algo1_half(const vector<Item>& items, int t){
         CCq[j] = computeSubarray(Cq[j], Wq, Pq);
     }
     cout << "Dq :" << endl; 
-    //print2DVector(Dq);
+    print2DVector(Dq);
 
-    cout << "Cq :" << endl;
-    //print2DVector(Cq);
+    cout << "Dq :" << endl; 
+    print2DVector(Cq);
+    
+    cout << "CCq :" << endl;
+    print2DVector(CCq);
     
     cout << "Ccq length = " << CCq.size() << endl;
     cout << "Dq length = " << Dq.size() << endl;
@@ -239,6 +248,8 @@ vector<vector<int>> Algo1_half(const vector<Item>& items, int t){
     for (int level = q - 1; level >= 0; --level) {
         int WlMax = t / (1 << level);
         int PlMax = opt / (1 << level);
+        cout << "WlMax = " << WlMax << endl;
+        cout << "PlMax = " << PlMax << endl;
 
         pair<int, int> Wl(0, WlMax);
         pair<int, int> Pl(0, PlMax);
@@ -249,8 +260,16 @@ vector<vector<int>> Algo1_half(const vector<Item>& items, int t){
         for (int j = 0; j < (1 << level); ++j) {
             cout << "Inside inner for loop, j = " << j << endl;
             vector<int> convolved = maxPlusConv(CCq[2 * j], CCq[2 * j + 1]);
-            vector<int> filtered = computeSubarray(convolved, Pl, Wl);
-            next_level_arrays[j] = filtered;
+            /*vector<int> filtered = computeSubarray(convolved, Pl, Wl);
+            for (const auto& num: filtered){
+                cout << num << " ";
+            }
+            */
+            cout << endl;
+            cout << "convolved length = " << convolved.size() << endl;
+            //cout << "filtered length = " << filtered.size() << endl;
+ 
+            next_level_arrays[j] = convolved;
         }
 
         // Safely update CCq
@@ -258,12 +277,41 @@ vector<vector<int>> Algo1_half(const vector<Item>& items, int t){
         CCq = next_level_arrays; // Ensure no unexpected optimizations
         cout << "After inner for loop" << endl;
     }
-    for(const auto& elem : CCq){
-        elem.size();
-    }
-    cout << "END MAXCONV" << endl;
 
-    return CCq;
+
+    cout << "END MAXCONV" << endl;
+    
+    cout << "CCq length = " << CCq.size() << endl;
+    cout << "CCq[0] length = " << CCq[0].size() << endl;
+    int interval_Tmax = t + sqrt(t * wMax);
+    int interval_Tmin = t - sqrt(t * wMax);
+
+    int interval_Pmax = opt + sqrt(opt * pMax);
+    int interval_Pmin = opt - sqrt(opt * pMax);
+
+    cout << " " << endl;
+    cout << "OPT TILDE = "  << opt << endl;
+    cout << "interval Tmax = " << interval_Tmax << " sqrt part = " << sqrt(t * wMax) <<endl;
+    cout << "interval Tmin = " << interval_Tmin << " sqrt part = " << sqrt(t * wMax)<< endl;
+    cout << "interval Pmax = " << interval_Pmax << " sqrt part = " << sqrt(opt * pMax) <<endl;
+    cout << "interval Pmin = " << interval_Pmin << " sqrt part = " << sqrt(opt * pMax)<< endl;
+
+    pair<int, int> interval_T(interval_Tmin, interval_Tmax);
+    pair<int, int> interval_P(interval_Pmin, interval_Pmax);
+
+    //return CCq;
+
+    /*
+    cout << "CCq[0] : " << endl; 
+    for(const auto& num : CCq[0]){
+        cout << num << " ";
+    }
+    */
+    cout << "before final assignment" << endl;
+    vector<int> final_opt = computeSubarray(CCq[0], interval_T, interval_P); 
+
+    cout << "before return";
+    return final_opt;
 }
 
 vector<Item> generateBalancedKnapsackItems(int num_items, int max_profit, int max_weight, int knapsack_capacity) {
@@ -300,16 +348,122 @@ void printVectorItem(const vector<Item>& vec) {
 
 int main() {
 
-    const int num_items = 1000;
-    const int max_profit = 100;
-    const int max_weight = 50;
-    const int knapsack_capacity = 25000;
 
-    vector<Item> items = generateBalancedKnapsackItems(num_items, max_profit, max_weight, knapsack_capacity);
-    int t = 50;
-    vector<vector<int>> opt;
-    opt = Algo1_half(items,knapsack_capacity);
+    vector<Item> items = {
+        {1, 56, 28},
+        {2, 63, 32},
+        {3, 74, 37},
+        {4, 52, 26},
+        {5, 68, 34},
+        {6, 59, 29},
+        {7, 62, 31},
+        {8, 70, 36},
+        {9, 48, 24},
+        {10, 77, 39},
+        {11, 65, 33},
+        {12, 50, 25},
+        {13, 58, 29},
+        {14, 73, 36},
+        {15, 61, 31},
+        {16, 66, 34},
+        {17, 72, 35},
+        {18, 64, 32},
+        {19, 60, 30},
+        {20, 53, 27},
+        {21, 69, 34},
+        {22, 55, 27},
+        {23, 76, 38},
+        {24, 49, 24},
+        {25, 67, 33},
+        {26, 75, 37},
+        {27, 57, 28},
+        {28, 71, 36},
+        {29, 54, 27},
+        {30, 68, 34},
+        {31, 63, 32},
+        {32, 74, 37},
+        {33, 52, 26},
+        {34, 66, 33},
+        {35, 59, 29},
+        {36, 62, 31},
+        {37, 70, 36},
+        {38, 48, 24},
+        {39, 77, 39},
+        {40, 65, 33},
+        {41, 50, 25},
+        {42, 58, 29},
+        {43, 73, 36},
+        {44, 61, 31},
+        {45, 66, 34},
+        {46, 72, 35},
+        {47, 64, 32},
+        {48, 60, 30},
+        {49, 53, 27},
+        {50, 69, 34},
+        {51, 55, 27},
+        {52, 76, 38},
+        {53, 49, 24},
+        {54, 67, 33},
+        {55, 75, 37},
+        {56, 57, 28},
+        {57, 71, 36},
+        {58, 54, 27},
+        {59, 68, 34},
+        {60, 63, 32},
+        {61, 74, 37},
+        {62, 52, 26},
+        {63, 66, 33},
+        {64, 59, 29},
+        {65, 62, 31},
+        {66, 70, 36},
+        {67, 48, 24},
+        {68, 77, 39},
+        {69, 65, 33},
+        {70, 50, 25},
+        {71, 58, 29},
+        {72, 73, 36},
+        {73, 61, 31},
+        {74, 66, 34},
+        {75, 72, 35},
+        {76, 64, 32},
+        {77, 60, 30},
+        {78, 53, 27},
+        {79, 69, 34},
+        {80, 55, 27},
+        {81, 76, 38},
+        {82, 49, 24},
+        {83, 67, 33},
+        {84, 75, 37},
+        {85, 57, 28},
+        {86, 71, 36},
+        {87, 54, 27},
+        {88, 68, 34},
+        {89, 63, 32},
+        {90, 74, 37},
+        {91, 52, 26},
+        {92, 66, 33},
+        {93, 59, 29},
+        {94, 62, 31},
+        {95, 70, 36},
+        {96, 48, 24},
+        {97, 77, 39},
+        {98, 65, 33},
+        {99, 50, 25},
+        {100, 58, 29}
+    };
 
-    cout << "OPT tilde = " << computeTildeOPT(num_items, knapsack_capacity, items) << endl;
+    int t = 1000;
+    vector<int> opt;
+    
+    cout << "Inside main function : before calling algo " << endl;
+
+    opt = Algo1_half(items,t);
+
+    for(const auto& elem : opt){
+        cout << elem << " ";
+    }
+
+    cout << "before opt tilde" ;
+    cout << "OPT tilde = " << computeTildeOPT(100, t, items) << endl;
 
 }
