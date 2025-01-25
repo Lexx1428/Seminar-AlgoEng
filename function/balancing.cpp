@@ -20,7 +20,7 @@ struct KnapsackInstance {
 };
 
 ostream& operator<<(ostream &os, const Item &item) {
-    os << ", Profit: " << item.profit << ", Weight: " << item.weight << " Ratio: " << item.profitToWeightRatio();
+    os << "Profit: " << item.profit << ", Weight: " << item.weight << " Ratio: " << item.profitToWeightRatio();
     return os;
 }
 
@@ -90,8 +90,15 @@ KnapsackInstance reduceToBalanced(const KnapsackInstance& original) {
     }
 
     int newCapacity = 0;
-    for (const auto& item: medium) {
-        newCapacity += item.weight;
+    int weightTracker = 0;
+    for (const auto& item : sortedItems) {
+        if (weightTracker + item.weight > original.capacity) {
+            break;
+        }
+        weightTracker += item.weight;
+        if (item.profitToWeightRatio() < 2*rho && item.profitToWeightRatio() > rho/2) {
+            newCapacity += item.weight;
+        }
     }
 
     KnapsackInstance balancedInstance = {medium, newCapacity};
@@ -100,13 +107,15 @@ KnapsackInstance reduceToBalanced(const KnapsackInstance& original) {
 
 int main() {
 
-    KnapsackInstance test = { {{10,20}, {20,30}, {30,60}, {50,90}},    50};
+    KnapsackInstance test = { {{8,1}, {7,7}, {5,6}, {6,9}, {3,5}, {1,7}}, 25};
 
 
     cout << test << endl;
     
-    cout << "Reduced instance: " << endl;
     KnapsackInstance reduced = reduceToBalanced(test);
+
+    cout << endl;
+    cout << "Reduced instance: " << endl;
 
     cout << reduced << endl;
 
