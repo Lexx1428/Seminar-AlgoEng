@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <cmath>
 #include <random>
+
 using namespace std;
 
 struct Item {
@@ -195,17 +196,17 @@ vector<vector<int>> Algo1_half(const vector<Item>& items, int t){
     cout << "opttilde/2^l = " << opt / numPartitions << endl;
 
     int WqMin = t / numPartitions - sqrt(deltaW / numPartitions) * eta;
-    int WqMax = t / numPartitions + sqrt(deltaW / numPartitions) * eta;
+    int WqMax = t / numPartitions;
     int PqMin = opt / numPartitions - sqrt(deltaP / numPartitions) * eta;
-    int PqMax = opt / numPartitions + sqrt(deltaP / numPartitions) * eta;
+    int PqMax = opt / numPartitions;
 
     cout << "WqMin = "<< WqMin << endl;
     cout << "WqMax = "<< WqMax << endl;
     cout << "PqMin = "<< PqMin << endl;
     cout << "PqMax = "<< PqMax << endl;
 
-    pair<int,int> Wq(WqMin,WqMax);
-    pair<int,int> Pq(WqMax,PqMax);
+    pair<int,int> Wq(0,WqMax);
+    pair<int,int> Pq(0,PqMax);
 
     pair<int,int> wStar(0, WqMax);
     pair<int,int> pStar(0, PqMax);
@@ -230,31 +231,36 @@ vector<vector<int>> Algo1_half(const vector<Item>& items, int t){
     //print2DVector(Cq);
     
     cout << "Ccq length = " << CCq.size() << endl;
+    cout << "Dq length = " << Dq.size() << endl;
     cout << "END PROFIT SEQ" << endl;
     cout << endl;
     
     cout << "START MAXCONV" << endl;
     for (int level = q - 1; level >= 0; --level) {
+        int WlMax = t / (1 << level);
+        int PlMax = opt / (1 << level);
 
-        int WlMin = t / (1 << level) - sqrt(deltaW / (1 << level)) * eta;
-        int WlMax = t / (1 << level) + sqrt(deltaW / (1 << level)) * eta;
-        int PlMin = opt / (1 << level) - sqrt(deltaP / (1 << level)) * eta;
-        int PlMax = opt / (1 << level) + sqrt(deltaP / (1 << level)) * eta;
-
-        pair<int,int> Wl(WlMin,WlMax);
-        pair<int,int> Pl(WlMax,PlMax);
+        pair<int, int> Wl(0, WlMax);
+        pair<int, int> Pl(0, PlMax);
 
         vector<vector<int>> next_level_arrays((1 << level));
+        cout << "next level array length = " << next_level_arrays.size() << endl;
+
         for (int j = 0; j < (1 << level); ++j) {
-            // Combine using max-plus convolution
+            cout << "Inside inner for loop, j = " << j << endl;
             vector<int> convolved = maxPlusConv(CCq[2 * j], CCq[2 * j + 1]);
-            vector<int> filtered = computeSubarray(convolved,Pl,Wl);
+            vector<int> filtered = computeSubarray(convolved, Pl, Wl);
             next_level_arrays[j] = filtered;
         }
-        CCq = next_level_arrays;
-    }
-    print2DVector(CCq);
 
+        // Safely update CCq
+        CCq.clear();
+        CCq = next_level_arrays; // Ensure no unexpected optimizations
+        cout << "After inner for loop" << endl;
+    }
+    for(const auto& elem : CCq){
+        elem.size();
+    }
     cout << "END MAXCONV" << endl;
 
     return CCq;
@@ -305,6 +311,5 @@ int main() {
     opt = Algo1_half(items,knapsack_capacity);
 
     cout << "OPT tilde = " << computeTildeOPT(num_items, knapsack_capacity, items) << endl;
-
 
 }
