@@ -205,9 +205,9 @@ vector<int> Algo1_half(const vector<Item>& items, int t){
     cout << "opttilde/2^l = " << opt / numPartitions << endl;
 
     int WqMin = t / numPartitions - sqrt(deltaW / numPartitions) * eta;
-    int WqMax = t / numPartitions;
+    int WqMax = t / numPartitions + 0.1 * (t / numPartitions) ;
     int PqMin = opt / numPartitions - sqrt(deltaP / numPartitions) * eta;
-    int PqMax = opt / numPartitions;
+    int PqMax = opt / numPartitions + 0.1 * (opt / numPartitions) ;
 
     cout << "WqMin = "<< WqMin << endl;
     cout << "WqMax = "<< WqMax << endl;
@@ -552,13 +552,14 @@ int main() {
 
     KnapsackInstance reduced = reduceToBalanced(test);
     
+    /*
     cout << "reduced capacity: " << reduced.capacity << endl;
     for (const auto& item : reduced.items) {
         cout << "Profit: " << item.profit << " weight: " << item.weight << " ratio: " << item.profitToWeightRatio() << endl;
     }
-    
+    */
 
-    //opt = Algo1_half(items,t);
+    opt = Algo1_half(reduced.items, reduced.capacity);
 
     /*
     for(const auto& elem : opt){
@@ -566,6 +567,7 @@ int main() {
     }
     */
 
-    cout << "OPT tilde = " << computeTildeOPT(100, t, items) << endl;
+    cout << "\n OPT tilde = " << computeTildeOPT(100, reduced.capacity, reduced.items) << endl;
+    cout << "DP opt = " << kSack(reduced.capacity, reduced.items);
 
 }
