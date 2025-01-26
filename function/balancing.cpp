@@ -2,6 +2,8 @@
 #include <algorithm>
 #include <cmath>
 #include <iostream>
+#include <chrono>
+
 using namespace std;
 
 
@@ -51,6 +53,19 @@ int findPmax(const vector<Item>& items) {
         }
     }
     return pmax;
+}
+
+vector<Item> generateDataset(const int &numItems, const int &maxWeight, const int &maxValue) {
+    vector<Item> items;
+    items.reserve(numItems);
+    srand(time(0));    //seed for randomness
+    for (int i = 0; i < numItems; ++i) {
+        int index = i;
+        int weight = rand() % maxWeight + 1;
+        int value = rand() % maxValue + 1;
+        items.push_back({value, weight});
+    }
+    return items;
 }
 
 KnapsackInstance reduceToBalanced(const KnapsackInstance& original) {
@@ -125,18 +140,45 @@ KnapsackInstance reduceToBalanced(const KnapsackInstance& original) {
     return balancedInstance;
 }
 
+void measureRuntime(KnapsackInstance input) {
+    auto start = chrono::high_resolution_clock::now();
+    reduceToBalanced(input);
+    auto end = chrono::high_resolution_clock::now();
+
+    chrono::duration<double> elapsed = end-start;
+    cout << "Input size = " << input.items.size() << endl << "time taken: " << elapsed.count() << " seconds" << endl;
+
+}
+
 int main() {
 
-    KnapsackInstance test = { {{8,1}, {7,7}, {5,6}, {6,9}, {3,5}, {1,7}}, 25};
+    KnapsackInstance test6 = { {{8,1}, {7,7}, {5,6}, {6,9}, {3,5}, {1,7}}, 25};
+    KnapsackInstance test10 = { {{8,1}, {7,7}, {5,6}, {6,9}, {3,5}, {1,7}, {4,5}, {6,7}, {10,9}, {1,1}}, 25};
+  
+    KnapsackInstance test1000;
+    test1000.capacity = 100000;
+    test1000.items = generateDataset(1000, 10000, 10000);
+
+    KnapsackInstance test10000;
+    test10000.capacity = 1000000;
+    test10000.items = generateDataset(10000, 1000, 1000);
+
+    KnapsackInstance test100000;
+    test100000.capacity = 10000000;
+    test100000.items = generateDataset(100000, 10000, 10000);
 
 
-    cout << test << endl;
+
+    //cout << test1000 << endl;
+
+    /*
     int pmax = findPmax(test.items);
     int wmax = findWmax(test.items);
     cout << "Wmax = " << wmax << endl;
     cout << "Pmax = " << pmax << endl;
     cout << endl;
     
+
     KnapsackInstance reduced = reduceToBalanced(test);
 
     cout << endl;
@@ -144,8 +186,8 @@ int main() {
 
     cout << reduced << endl;
 
+    */
 
-
-
+    measureRuntime(test100000);
     return 0;
 }
