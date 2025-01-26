@@ -11,13 +11,16 @@
 using namespace std;
 
 struct Item {
-    int index;
     int profit;
     int weight;
+
+    double profitToWeightRatio() const {
+        return static_cast<double>(profit) / weight;
+    }
 };
 
 ostream& operator<<(ostream &os, const Item &item) {
-    os << "Index: " << item.index << ", Value: " << item.profit << ", Weight: " << item.weight;
+    os << ", Value: " << item.profit << ", Weight: " << item.weight;
     return os;
 }
 
@@ -29,7 +32,7 @@ vector<Item> generateDataset(const int &numItems, const int &maxWeight, const in
         int index = i;
         int weight = rand() % maxWeight + 1;
         int value = rand() % maxValue + 1;
-        items.push_back({index, value, weight});
+        items.push_back({value, weight});
     }
     return items;
 }
@@ -309,7 +312,6 @@ vector<int> Algo1_half(const vector<Item>& items, int t){
     }
 
     vector<int> final_opt = computeSubarray(CCq[0], interval_T, interval_P); 
-;
     return final_opt;
 }
 
@@ -333,129 +335,230 @@ vector<Item> generateBalancedKnapsackItems(int num_items, int max_profit, int ma
             weight = weight_dist(gen);
         }
 
-        items.push_back({i + 1, profit, weight});
+        items.push_back({profit, weight});
     }
 
     return items;
 }
 
-void printVectorItem(const vector<Item>& vec) {
-    for (const auto& element : vec) {
-        cout << element.index << " " << element.profit << " " << element.weight << endl;
+
+struct KnapsackInstance {
+    std::vector<Item> items;
+    int capacity;
+};
+
+
+int findWmax(const vector<Item>& items) {
+    int wmax = 0;
+    for (const auto& item : items) {
+        if (item.weight > wmax) {
+            wmax = item.weight;
+        }
     }
+    return wmax;
 }
 
+int findPmax(const vector<Item>& items) {
+    int pmax = 0;
+    for (const auto& item : items) {
+        if (item.profit > pmax) {
+            pmax = item.profit;
+        }
+    }
+    return pmax;
+}
+
+KnapsackInstance reduceToBalanced(const KnapsackInstance& original) {
+    vector<Item> sortedItems = original.items;
+    sort(sortedItems.begin(), sortedItems.end(), [](const Item &a, const Item &b){
+        return a.profitToWeightRatio() > b.profitToWeightRatio();
+    });
+
+
+    //find rho (p) from the prefix solution
+    //prefix solution: items {1,..,j} for maximum j such that w1+...+wj <= t (original capacity)
+    //rho = profit-to-weight ratio of least profitable (last) item in prefix solution
+    int currentWeight = 0;
+    int j = 0;
+    double rho = 0.0;
+
+    for (; j < sortedItems.size(); ++j) {
+        if (currentWeight + sortedItems[j].weight > original.capacity) {
+            break;
+        }
+        currentWeight += sortedItems[j].weight;
+    }
+
+    if (j > 0 && j <= sortedItems.size()) {
+        rho = sortedItems[j-1].profitToWeightRatio();
+    }
+
+    //partition items into good, medium and bad
+    vector<Item> good;
+    vector<Item> medium;
+    vector<Item> bad;
+
+    for (const auto& item : sortedItems) {
+        double ratio = item.profitToWeightRatio();
+        if (ratio > 2*rho) {
+            good.push_back(item);
+        }
+        else if (ratio < rho/2) {
+            bad.push_back(item);
+        }
+        else { medium.push_back(item);}
+    } 
+
+    cout << "good items: " << endl;
+    for (const auto& item : good) {
+        cout << item << endl;
+    }
+
+    cout << "Medium items: " << endl;
+    for (const auto& item : medium) {
+        cout << item << endl;
+    }
+
+    cout << "bad items: " << endl;
+    for (const auto& item : bad) {
+        cout << item << endl;
+    }
+
+    int newCapacity = 0;
+    int weightTracker = 0;
+    for (const auto& item : sortedItems) {
+        if (weightTracker + item.weight > original.capacity) {
+            break;
+        }
+        weightTracker += item.weight;
+        if (item.profitToWeightRatio() < 2*rho && item.profitToWeightRatio() > rho/2) {
+            newCapacity += item.weight;
+        }
+    }
+
+    KnapsackInstance balancedInstance = {medium, newCapacity};
+    return balancedInstance;
+}
 int main() {
 
 
     vector<Item> items = {
-        {1, 56, 28},
-        {2, 63, 32},
-        {3, 74, 37},
-        {4, 52, 26},
-        {5, 68, 34},
-        {6, 59, 29},
-        {7, 62, 31},
-        {8, 70, 36},
-        {9, 48, 24},
-        {10, 77, 39},
-        {11, 65, 33},
-        {12, 50, 25},
-        {13, 58, 29},
-        {14, 73, 36},
-        {15, 61, 31},
-        {16, 66, 34},
-        {17, 72, 35},
-        {18, 64, 32},
-        {19, 60, 30},
-        {20, 53, 27},
-        {21, 69, 34},
-        {22, 55, 27},
-        {23, 76, 38},
-        {24, 49, 24},
-        {25, 67, 33},
-        {26, 75, 37},
-        {27, 57, 28},
-        {28, 71, 36},
-        {29, 54, 27},
-        {30, 68, 34},
-        {31, 63, 32},
-        {32, 74, 37},
-        {33, 52, 26},
-        {34, 66, 33},
-        {35, 59, 29},
-        {36, 62, 31},
-        {37, 70, 36},
-        {38, 48, 24},
-        {39, 77, 39},
-        {40, 65, 33},
-        {41, 50, 25},
-        {42, 58, 29},
-        {43, 73, 36},
-        {44, 61, 31},
-        {45, 66, 34},
-        {46, 72, 35},
-        {47, 64, 32},
-        {48, 60, 30},
-        {49, 53, 27},
-        {50, 69, 34},
-        {51, 55, 27},
-        {52, 76, 38},
-        {53, 49, 24},
-        {54, 67, 33},
-        {55, 75, 37},
-        {56, 57, 28},
-        {57, 71, 36},
-        {58, 54, 27},
-        {59, 68, 34},
-        {60, 63, 32},
-        {61, 74, 37},
-        {62, 52, 26},
-        {63, 66, 33},
-        {64, 59, 29},
-        {65, 62, 31},
-        {66, 70, 36},
-        {67, 48, 24},
-        {68, 77, 39},
-        {69, 65, 33},
-        {70, 50, 25},
-        {71, 58, 29},
-        {72, 73, 36},
-        {73, 61, 31},
-        {74, 66, 34},
-        {75, 72, 35},
-        {76, 64, 32},
-        {77, 60, 30},
-        {78, 53, 27},
-        {79, 69, 34},
-        {80, 55, 27},
-        {81, 76, 38},
-        {82, 49, 24},
-        {83, 67, 33},
-        {84, 75, 37},
-        {85, 57, 28},
-        {86, 71, 36},
-        {87, 54, 27},
-        {88, 68, 34},
-        {89, 63, 32},
-        {90, 74, 37},
-        {91, 52, 26},
-        {92, 66, 33},
-        {93, 59, 29},
-        {94, 62, 31},
-        {95, 70, 36},
-        {96, 48, 24},
-        {97, 77, 39},
-        {98, 65, 33},
-        {99, 50, 25},
-        {100, 58, 29}
+        {56, 28},
+        {63, 32},
+        {74, 37},
+        {52, 26},
+        {68, 34},
+        {59, 29},
+        {62, 31},
+        {70, 36},
+        {48, 24},
+        {77, 39},
+        {65, 33},
+        {50, 25},
+        {58, 29},
+        {73, 36},
+        {61, 31},
+        {66, 34},
+        {72, 35},
+        {64, 32},
+        {60, 30},
+        {53, 27},
+        {69, 34},
+        {55, 27},
+        {76, 38},
+        {49, 24},
+        {67, 33},
+        {75, 37},
+        {57, 28},
+        {71, 36},
+        {54, 27},
+        {68, 34},
+        {63, 32},
+        {74, 37},
+        {52, 26},
+        {66, 33},
+        {59, 29},
+        {62, 31},
+        {70, 36},
+        {48, 24},
+        {77, 39},
+        {65, 33},
+        {50, 25},
+        {58, 29},
+        {73, 36},
+        {61, 31},
+        {66, 34},
+        {72, 35},
+        {64, 32},
+        {60, 30},
+        {53, 27},
+        {69, 34},
+        {55, 27},
+        {76, 38},
+        {49, 24},
+        {67, 33},
+        {75, 37},
+        {57, 28},
+        {71, 36},
+        {54, 27},
+        {68, 34},
+        {63, 32},
+        {74, 37},
+        {52, 26},
+        {66, 33},
+        {59, 29},
+        {62, 31},
+        {70, 36},
+        {48, 24},
+        {77, 39},
+        {65, 33},
+        {50, 25},
+        {58, 29},
+        {73, 36},
+        {61, 31},
+        {66, 34},
+        {72, 35},
+        {64, 32},
+        {60, 30},
+        {53, 27},
+        {69, 34},
+        {55, 27},
+        {76, 38},
+        {49, 24},
+        {67, 33},
+        {75, 37},
+        {57, 28},
+        {71, 36},
+        {54, 27},
+        {68, 34},
+        {63, 32},
+        {74, 37},
+        {52, 26},
+        {66, 33},
+        {59, 29},
+        {62, 31},
+        {70, 36},
+        {48, 24},
+        {77, 39},
+        {65, 33},
+        {50, 25},
+        {58, 29}
     };
+
 
     int t = 1000;
     vector<int> opt;
+    KnapsackInstance test = {items, t};
+
+    KnapsackInstance reduced = reduceToBalanced(test);
+    
+    cout << "reduced capacity: " << reduced.capacity << endl;
+    for (const auto& item : reduced.items) {
+        cout << "Profit: " << item.profit << " weight: " << item.weight << " ratio: " << item.profitToWeightRatio() << endl;
+    }
     
 
-    opt = Algo1_half(items,t);
+    //opt = Algo1_half(items,t);
 
     /*
     for(const auto& elem : opt){
