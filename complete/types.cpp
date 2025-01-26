@@ -1,8 +1,8 @@
 #include "types.h"
 
+using namespace std;
 
 struct Item {
-    int index;
     int profit;
     int weight;
 

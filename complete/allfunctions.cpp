@@ -1,5 +1,6 @@
 #include "allfunctions.h"
 
+
 void partitionGroups(const vector<Item> &items, vector<vector<Item>> &groups, int count_of_groups) {
 
     size_t length = items.size();

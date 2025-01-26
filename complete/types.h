@@ -3,10 +3,11 @@
 
 #include <iostream>
 #include <vector>
+
+
 using namespace std;
 
 struct Item {
-    int index;
     int profit;
     int weight;
 
@@ -21,9 +22,9 @@ struct KnapsackInstance {
 };
 
 
-ostream& operator<<(ostream &os, const Item &item) {}
+ostream& operator<<(ostream &os, const Item &item) {};
 
 
-ostream& operator<<(ostream &os, const KnapsackInstance &Instance) {}
+ostream& operator<<(ostream &os, const KnapsackInstance &instance) {};
 
 #endif
