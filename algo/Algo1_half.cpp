@@ -205,9 +205,9 @@ vector<int> Algo1_half(const vector<Item>& items, int t){
     cout << "opttilde/2^l = " << opt / numPartitions << endl;
 
     int WqMin = t / numPartitions - (0.2 * (t / numPartitions));
-    int WqMax = t / numPartitions + (0.2 * (t / numPartitions)) ;
+    int WqMax = t / numPartitions + (0.4 * (t / numPartitions)) ;
     int PqMin = opt / numPartitions - (0.2 * (opt / numPartitions));
-    int PqMax = opt / numPartitions + (0.2 * (opt / numPartitions)) ;
+    int PqMax = opt / numPartitions + (0.4 * (opt / numPartitions)) ;
 
     cout << "WqMin = "<< WqMin << endl;
     cout << "WqMax = "<< WqMax << endl;
@@ -226,7 +226,7 @@ vector<int> Algo1_half(const vector<Item>& items, int t){
 
     
     cout << endl;
-    cout << "START PROFIT SEQ" << endl;
+    cout << "-----START PROFIT SEQ-----" << endl;
 
     for (int j = 0; j < numPartitions; ++j) {
         Dq[j] = computeProfitSequence(groups[j], WqMax);
@@ -234,20 +234,20 @@ vector<int> Algo1_half(const vector<Item>& items, int t){
         CCq[j] = computeSubarray(Cq[j], Wq, Pq);
     }
     cout << "Dq :" << endl; 
-    print2DVector(Dq);
+    //print2DVector(Dq);
 
     cout << "Dq :" << endl; 
-    print2DVector(Cq);
+    //print2DVector(Cq);
     
     cout << "CCq :" << endl;
-    print2DVector(CCq);
+    //print2DVector(CCq);
     
     cout << "Ccq length = " << CCq.size() << endl;
     cout << "Dq length = " << Dq.size() << endl;
-    cout << "END PROFIT SEQ" << endl;
+    cout << "-----END PROFIT SEQ----" << endl;
     cout << endl;
     
-    cout << "START MAXCONV" << endl;
+    cout << "----START MAXCONV-----" << endl;
     for (int level = q - 1; level >= 0; --level) {
         int WlMax = t / (1 << level) + 0.1 * t / (1 << level) ;
         int PlMax = opt / (1 << level) + 0.1 * opt / (1 << level);
@@ -286,7 +286,7 @@ vector<int> Algo1_half(const vector<Item>& items, int t){
     }
 
 
-    cout << "END MAXCONV" << endl;
+    cout << "----END MAXCONV----" << endl;
     
     cout << "CCq length = " << CCq.size() << endl;
     cout << "CCq[0] length = " << CCq[0].size() << endl;
@@ -305,16 +305,17 @@ vector<int> Algo1_half(const vector<Item>& items, int t){
     pair<int, int> interval_T(interval_Tmin, interval_Tmax);
     pair<int, int> interval_P(interval_Pmin, interval_Pmax);
 
-    //return CCq;
+    
 
     
     cout << "Convolution: " << endl; 
     for(const auto& num : CCq[0]){
         cout << num << " ";
     }
+    return CCq[0];
 
-    vector<int> final_opt = computeSubarray(CCq[0], interval_T, interval_P); 
-    return final_opt;
+    //vector<int> final_opt = computeSubarray(CCq[0], interval_T, interval_P); 
+    //return final_opt;
 }
 
 vector<Item> generateBalancedKnapsackItems(int num_items, int max_profit, int max_weight, int knapsack_capacity) {
@@ -470,10 +471,15 @@ int main() {
     }
     */
     cout << endl;
-    cout << "capacity = " << reduced.capacity << endl;
-
-    cout << "OPT tilde = " << computeTildeOPT(num_items, t, items)<< endl;
-    cout << "DP opt (reduced)= " << kSack(t, items) << endl;
+    cout << "num of items (original) = " << num_items <<endl;
+    cout << "num of items (reduced) = " << reduced.items.size() << endl;
+    cout << endl;
+    cout << "capacity (original)= " << t << endl;
+    cout << "capacity (reduced)= " << reduced.capacity << endl;
+    cout << endl;
+    cout << "OPT tilde (original)= " << computeTildeOPT(num_items, t, items)<< endl;
+    cout << "DP opt (original)= " << kSack(t, items) << endl;
+    cout << endl;
     cout << "OPT tilde (reduced)= " << computeTildeOPT(reduced.items.size(), reduced.capacity, reduced.items) << endl;
     cout << "DP opt (reduced)= " << kSack(reduced.capacity, reduced.items);
 
