@@ -205,9 +205,9 @@ vector<int> Algo1_half(const vector<Item>& items, int t){
     cout << "opttilde/2^l = " << opt / numPartitions << endl;
 
     int WqMin = t / numPartitions - (0.2 * (t / numPartitions));
-    int WqMax = t / numPartitions + (0.4 * (t / numPartitions)) ;
+    int WqMax = t / numPartitions + (0.3 * (t / numPartitions)) ;
     int PqMin = opt / numPartitions - (0.2 * (opt / numPartitions));
-    int PqMax = opt / numPartitions + (0.4 * (opt / numPartitions)) ;
+    int PqMax = opt / numPartitions + (0.3 * (opt / numPartitions)) ;
 
     cout << "WqMin = "<< WqMin << endl;
     cout << "WqMax = "<< WqMax << endl;
@@ -309,9 +309,12 @@ vector<int> Algo1_half(const vector<Item>& items, int t){
 
     
     cout << "Convolution: " << endl; 
+    /*
     for(const auto& num : CCq[0]){
         cout << num << " ";
     }
+    */
+    cout << "ALGO 1 sol = " << CCq[0].back();
     return CCq[0];
 
     //vector<int> final_opt = computeSubarray(CCq[0], interval_T, interval_P); 
@@ -444,13 +447,15 @@ KnapsackInstance reduceToBalanced(const KnapsackInstance& original) {
 }
 int main() {
 
-    int num_items = 100;
-    int max_weight = 80;
-    int max_profit = 90;
-    vector<Item> items = generateDataset(num_items, max_weight, max_profit);
+    int num_items = 1000;
+    int max_weight = 800;
+    int max_profit = 900;
+    int t = 10000;
+    
+    vector<Item> items = generateBalancedKnapsackItems(num_items, max_weight, max_profit,t);
 
 
-    int t = 1000;
+    
     vector<int> opt;
     KnapsackInstance test = {items, t};
 
