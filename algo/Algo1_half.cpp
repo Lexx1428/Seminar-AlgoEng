@@ -111,7 +111,7 @@ std::vector<int> computeSubarray(const std::vector<int> &input, const std::pair<
     return subarray;
 }
 
-int computeTildeOPT(int n, double t, vector<Item> items) {
+int computeTildeOPT(int n, int t, vector<Item> items) {
     
     
     vector<pair<double, int>> value_weight_ratios(n);
@@ -204,10 +204,10 @@ vector<int> Algo1_half(const vector<Item>& items, int t){
     cout << "t/2^l = " << t / numPartitions << endl;
     cout << "opttilde/2^l = " << opt / numPartitions << endl;
 
-    int WqMin = t / numPartitions - sqrt(deltaW / numPartitions) * eta;
-    int WqMax = t / numPartitions + 0.1 * (t / numPartitions) ;
-    int PqMin = opt / numPartitions - sqrt(deltaP / numPartitions) * eta;
-    int PqMax = opt / numPartitions + 0.1 * (opt / numPartitions) ;
+    int WqMin = t / numPartitions - (0.2 * (t / numPartitions));
+    int WqMax = t / numPartitions + (0.2 * (t / numPartitions)) ;
+    int PqMin = opt / numPartitions - (0.2 * (opt / numPartitions));
+    int PqMax = opt / numPartitions + (0.2 * (opt / numPartitions)) ;
 
     cout << "WqMin = "<< WqMin << endl;
     cout << "WqMax = "<< WqMax << endl;
@@ -249,13 +249,16 @@ vector<int> Algo1_half(const vector<Item>& items, int t){
     
     cout << "START MAXCONV" << endl;
     for (int level = q - 1; level >= 0; --level) {
-        int WlMax = t / (1 << level);
-        int PlMax = opt / (1 << level);
+        int WlMax = t / (1 << level) + 0.1 * t / (1 << level) ;
+        int PlMax = opt / (1 << level) + 0.1 * opt / (1 << level);
+        int WlMin = t / (1 << level) - 0.1 * t / (1 << level);
+        int PlMin = opt / (1 << level) - 0.1 * opt / (1 << level);
+
         cout << "WlMax = " << WlMax << endl;
         cout << "PlMax = " << PlMax << endl;
 
-        pair<int, int> Wl(0, WlMax);
-        pair<int, int> Pl(0, PlMax);
+        pair<int, int> Wl(WlMin, WlMax);
+        pair<int, int> Pl(PlMin, PlMax);
 
         vector<vector<int>> next_level_arrays((1 << level));
         cout << "next level array length = " << next_level_arrays.size() << endl;
@@ -294,7 +297,6 @@ vector<int> Algo1_half(const vector<Item>& items, int t){
     int interval_Pmin = opt - sqrt(opt * pMax);
 
     cout << " " << endl;
-    cout << "OPT TILDE = "  << opt << endl;
     cout << "interval Tmax = " << interval_Tmax << " sqrt part = " << sqrt(t * wMax) <<endl;
     cout << "interval Tmin = " << interval_Tmin << " sqrt part = " << sqrt(t * wMax)<< endl;
     cout << "interval Pmax = " << interval_Pmax << " sqrt part = " << sqrt(opt * pMax) <<endl;
@@ -306,7 +308,7 @@ vector<int> Algo1_half(const vector<Item>& items, int t){
     //return CCq;
 
     
-    cout << "CCq[0] : " << endl; 
+    cout << "Convolution: " << endl; 
     for(const auto& num : CCq[0]){
         cout << num << " ";
     }
@@ -441,109 +443,10 @@ KnapsackInstance reduceToBalanced(const KnapsackInstance& original) {
 }
 int main() {
 
-
-    vector<Item> items = {
-        {56, 28},
-        {63, 32},
-        {74, 37},
-        {52, 26},
-        {68, 34},
-        {59, 29},
-        {62, 31},
-        {70, 36},
-        {48, 24},
-        {77, 39},
-        {65, 33},
-        {50, 25},
-        {58, 29},
-        {73, 36},
-        {61, 31},
-        {66, 34},
-        {72, 35},
-        {64, 32},
-        {60, 30},
-        {53, 27},
-        {69, 34},
-        {55, 27},
-        {76, 38},
-        {49, 24},
-        {67, 33},
-        {75, 37},
-        {57, 28},
-        {71, 36},
-        {54, 27},
-        {68, 34},
-        {63, 32},
-        {74, 37},
-        {52, 26},
-        {66, 33},
-        {59, 29},
-        {62, 31},
-        {70, 36},
-        {48, 24},
-        {77, 39},
-        {65, 33},
-        {50, 25},
-        {58, 29},
-        {73, 36},
-        {61, 31},
-        {66, 34},
-        {72, 35},
-        {64, 32},
-        {60, 30},
-        {53, 27},
-        {69, 34},
-        {55, 27},
-        {76, 38},
-        {49, 24},
-        {67, 33},
-        {75, 37},
-        {57, 28},
-        {71, 36},
-        {54, 27},
-        {68, 34},
-        {63, 32},
-        {74, 37},
-        {52, 26},
-        {66, 33},
-        {59, 29},
-        {62, 31},
-        {70, 36},
-        {48, 24},
-        {77, 39},
-        {65, 33},
-        {50, 25},
-        {58, 29},
-        {73, 36},
-        {61, 31},
-        {66, 34},
-        {72, 35},
-        {64, 32},
-        {60, 30},
-        {53, 27},
-        {69, 34},
-        {55, 27},
-        {76, 38},
-        {49, 24},
-        {67, 33},
-        {75, 37},
-        {57, 28},
-        {71, 36},
-        {54, 27},
-        {68, 34},
-        {63, 32},
-        {74, 37},
-        {52, 26},
-        {66, 33},
-        {59, 29},
-        {62, 31},
-        {70, 36},
-        {48, 24},
-        {77, 39},
-        {65, 33},
-        {50, 25},
-        {58, 29}
-    };
+    int num_items = 100;
+    int max_weight = 80;
+    int max_profit = 90;
+    vector<Item> items = generateDataset(num_items, max_weight, max_profit);
 
 
     int t = 1000;
@@ -566,8 +469,12 @@ int main() {
         cout << elem << " ";
     }
     */
+    cout << endl;
+    cout << "capacity = " << reduced.capacity << endl;
 
-    cout << "\n OPT tilde = " << computeTildeOPT(100, reduced.capacity, reduced.items) << endl;
-    cout << "DP opt = " << kSack(reduced.capacity, reduced.items);
+    cout << "OPT tilde = " << computeTildeOPT(num_items, t, items)<< endl;
+    cout << "DP opt (reduced)= " << kSack(t, items) << endl;
+    cout << "OPT tilde (reduced)= " << computeTildeOPT(reduced.items.size(), reduced.capacity, reduced.items) << endl;
+    cout << "DP opt (reduced)= " << kSack(reduced.capacity, reduced.items);
 
 }
