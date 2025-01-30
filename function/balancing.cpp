@@ -137,6 +137,9 @@ KnapsackInstance reduceToBalanced(const KnapsackInstance& original) {
     }
 
     KnapsackInstance balancedInstance = {medium, newCapacity};
+    //KnapsackInstance2: bad items in ranges [0, 10wmax] with profits capped to 10pmax
+    //KnapsackInstance3: 
+
     return balancedInstance;
 }
 
