@@ -163,7 +163,7 @@ void print2DVector(const vector<vector<int>>& vec) {
         for (const auto& element : row) { // Iterate through each element in the row
             cout << element << " ";
         }
-        cout << "row"<< endl; // Newline after each row
+        cout << "--end of row --"<< endl; // Newline after each row
     }
 }
 
@@ -235,13 +235,13 @@ vector<int> Algo1_half(const vector<Item>& items, int t){
         CCq[j] = computeSubarray(Cq[j], Wq, Pq);
     }
     cout << "Dq :" << endl; 
-    print2DVector(Dq);
+    //print2DVector(Dq);
 
     cout << "Dq :" << endl; 
     //print2DVector(Cq);
     
     cout << "CCq :" << endl;
-    print2DVector(CCq);
+    //print2DVector(CCq);
     
     cout << "Ccq length = " << CCq.size() << endl;
     cout << "Dq length = " << Dq.size() << endl;
@@ -269,13 +269,13 @@ vector<int> Algo1_half(const vector<Item>& items, int t){
             vector<int> convolved = maxPlusConv(CCq[2 * j], CCq[2 * j + 1]);
             vector<int> filtered = computeSubarray(convolved, Pl, Wl);
             
-            for (const auto& num: filtered){
-                cout << num << " ";
-            }
+            //for (const auto& num: filtered){
+                //cout << num << " ";
+            //}
             
             //cout << endl;
-            cout << "convolved length = " << convolved.size() << endl;
-            cout << "filtered length = " << filtered.size() << endl;
+            //cout << "convolved length = " << convolved.size() << endl;
+            //cout << "filtered length = " << filtered.size() << endl;
  
             next_level_arrays[j] = filtered;
         }
@@ -303,7 +303,7 @@ vector<int> Algo1_half(const vector<Item>& items, int t){
     cout << "interval Pmax = " << interval_Pmax << " sqrt part = " << sqrt(opt * pMax) <<endl;
     cout << "interval Pmin = " << interval_Pmin << " sqrt part = " << sqrt(opt * pMax)<< endl;
 
-    pair<int, int> interval_T(0,t);
+    pair<int, int> interval_T(interval_Tmin,t);
     pair<int, int> interval_P(interval_Pmin, interval_Pmax);
 
     
@@ -466,33 +466,12 @@ KnapsackInstance reduceToBalanced(const KnapsackInstance& original) {
 }
 int main() {
 
-    int num_items = 20;
-    int max_weight = 5;
-    int max_profit = 5;
-    int t = 30;
+    int num_items = 300;
+    int max_weight = 20;
+    int max_profit = 20;
+    int t = 600;
     
-    vector<Item> items = {
-        {3, 2},
-        {5, 4},
-        {1, 1},
-        {4, 3},
-        {2, 5},
-        {5, 2},
-        {3, 1},
-        {4, 4},
-        {2, 3},
-        {1, 5},
-        {3, 5},
-        {5, 3},
-        {2, 1},
-        {4, 2},
-        {1, 4},
-        {5, 5},
-        {3, 3},
-        {4, 1},
-        {2, 4},
-        {1, 2}
-    };
+    vector<Item> items = generateDataset(num_items, max_profit, max_weight);
 
 
     
