@@ -22,9 +22,9 @@ struct KnapsackInstance {
 };
 
 
-ostream& operator<<(ostream &os, const Item &item) {};
+ostream& operator<<(ostream &os, const Item &item);
 
 
-ostream& operator<<(ostream &os, const KnapsackInstance &instance) {};
+ostream& operator<<(ostream &os, const KnapsackInstance &instance);
 
 #endif
