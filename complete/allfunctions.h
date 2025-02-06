@@ -29,14 +29,11 @@ int computeTildeOPT(int t, vector<Item> items);
 
 vector<int> maxPlusConv(const vector<int> &a, const vector<int> &b);
 
-void print2DVector(const vector<vector<int>>& vec);
-
 int findWmax(const vector<Item>& items);
 
 int findPmax(const vector<Item>& items);
 
 vector<Item> generateDataset(const int &numItems, const int &maxWeight, const int &maxValue);
-
 
 KnapsackInstance reduceToBalanced(const KnapsackInstance& original);
 

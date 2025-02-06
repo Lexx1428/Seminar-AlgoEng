@@ -87,12 +87,12 @@ int computeTildeOPT(int t, vector<Item> items) {
 
     sort(value_weight_ratios.begin(), value_weight_ratios.end(), greater<pair<double, int>>());
 
-    double total_value = 0.0;
-    double total_weight = 0.0;  
+    int total_value = 0;
+    int total_weight = 0;  
     int i; 
     for (i = 0; i < n; ++i) {
         int index = value_weight_ratios[i].second;
-        if (total_weight + items[index].weight <= t) {  // If full item fits, take it completely
+        if (total_weight + items[index].weight <= t) { 
             total_weight += items[index].weight;
             total_value += items[index].profit;
         } else {
@@ -121,15 +121,6 @@ vector<int> maxPlusConv(const vector<int> &a, const vector<int> &b) {
         }
     }
     return c;
-}
-
-void print2DVector(const vector<vector<int>>& vec) {
-    for (const auto& row : vec) { // Iterate through each row
-        for (const auto& element : row) { // Iterate through each element in the row
-            cout << element << " ";
-        }
-        cout << "--end of row--"<< endl; // Newline after each row
-    }
 }
 
 int findWmax(const vector<Item>& items) {
