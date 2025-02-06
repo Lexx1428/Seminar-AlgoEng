@@ -4,10 +4,10 @@
 
 
 int main() {
-    int num_items = 500;
+    int num_items = 300;
     int max_weight = 30;
     int max_profit = 30;
-    int t = 700;
+    int t = 500;
 
     vector<Item> items = generateDataset(num_items, max_profit, max_weight);
     KnapsackInstance test = {items, t};
