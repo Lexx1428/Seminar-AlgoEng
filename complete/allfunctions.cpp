@@ -77,9 +77,9 @@ std::vector<int> computeSubarray(const std::vector<int> &input, const std::pair<
 
 
 
-int computeTildeOPT(int n, double t, vector<Item> items) {
+int computeTildeOPT(int t, vector<Item> items) {
     
-    
+    int n = items.size();
     vector<pair<double, int>> value_weight_ratios(n);
     for (int i = 0; i < n; i++) {
         value_weight_ratios[i] = {static_cast<double>(items[i].profit) / items[i].weight, i};  //store ratio and original index
@@ -189,7 +189,6 @@ KnapsackInstance reduceToBalanced(const KnapsackInstance& original) {
         rho = sortedItems[j-1].profitToWeightRatio();
     }
 
-    //partition items into good, medium and bad
     vector<Item> good;
     vector<Item> medium;
     vector<Item> bad;
@@ -205,20 +204,6 @@ KnapsackInstance reduceToBalanced(const KnapsackInstance& original) {
         else { medium.push_back(item);}
     } 
 
-    cout << "good items: " << endl;
-    for (const auto& item : good) {
-        cout << item << endl;
-    }
-
-    cout << "Medium items: " << endl;
-    for (const auto& item : medium) {
-        cout << item << endl;
-    }
-
-    cout << "bad items: " << endl;
-    for (const auto& item : bad) {
-        cout << item << endl;
-    }
 
     int newCapacity = 0;
     int weightTracker = 0;
@@ -244,10 +229,7 @@ vector<int> Algo1_half(const vector<Item>& items, int t){
         pMax = max(pMax, item.profit);
     }
 
-    cout << "pMax = " << pMax << endl; 
-    cout << "wMax = " << wMax << endl;
-    int opt = computeTildeOPT(items.size(),t ,items);
-    cout << "Approximate OPT: " << opt << endl;
+    int opt = computeTildeOPT(t ,items);
 
     int q = log2(min(t / wMax, opt / pMax));
     if (q < 0) q = 0; // Ensure q is non-negative
@@ -259,30 +241,11 @@ vector<int> Algo1_half(const vector<Item>& items, int t){
     vector<vector<Item>> groups;
     partitionGroups(items, groups, numPartitions);
 
-    
-    cout << "Partitions = " << numPartitions << endl;
-
-    double error_margin_p = sqrt(double(deltaP / numPartitions)) * eta;
-    double error_margin_w = sqrt(double(deltaW / numPartitions)) * eta;
-
-    cout << "delta p = " << deltaP << endl;
-    cout << "delta w = " << deltaW << endl;
-    cout << "eta= " << eta << endl; 
-    cout << "Without squareroot = " << deltaP / numPartitions << endl;
-    cout << "error margin of P = " << error_margin_p << endl;
-    cout << "error margin of W = " << error_margin_w << endl;
-    cout << "t/2^l = " << t / numPartitions << endl;
-    cout << "opttilde/2^l = " << opt / numPartitions << endl;
 
     int WqMin = t / numPartitions - sqrt(deltaW/numPartitions) * eta;
     int WqMax = t / numPartitions + sqrt(deltaW/numPartitions) * eta;
     int PqMin = opt / numPartitions - sqrt(deltaP/numPartitions) * eta;
     int PqMax = opt / numPartitions + sqrt(deltaP/numPartitions) * eta;
-
-    cout << "WqMin = "<< WqMin << endl;
-    cout << "WqMax = "<< WqMax << endl;
-    cout << "PqMin = "<< PqMin << endl;
-    cout << "PqMax = "<< PqMax << endl;
 
     pair<int,int> Wq(WqMin,WqMax);
     pair<int,int> Pq(PqMin,PqMax);
@@ -294,61 +257,29 @@ vector<int> Algo1_half(const vector<Item>& items, int t){
     vector<vector<int>> Cq(numPartitions);
     vector<vector<int>> CCq(numPartitions);
 
-    
-    cout << endl;
-    cout << "-----START PROFIT SEQ-----" << endl;
-
     for (int j = 0; j < numPartitions; ++j) {
         Dq[j] = computeProfitSequence(groups[j], WqMax);
         Cq[j] = computeSubarray(Dq[j], wStar, pStar);
         CCq[j] = computeSubarray(Cq[j], Wq, Pq);
     }
-    cout << "Dq :" << endl; 
-    //print2DVector(Dq);
 
-    cout << "Dq :" << endl; 
-    //print2DVector(Cq);
-    
-    cout << "CCq :" << endl;
-    //print2DVector(CCq);
-    
-    cout << "Ccq length = " << CCq.size() << endl;
-    cout << "Dq length = " << Dq.size() << endl;
-    cout << "-----END PROFIT SEQ----" << endl;
-    cout << endl;
-    
-    cout << "----START MAXCONV-----" << endl;
+ 
     for (int level = q - 1; level >= 0; --level) {
         int WlMax = t / (1 << level) + sqrt(deltaW/numPartitions) * eta ;
         int PlMax = opt / (1 << level) + sqrt(deltaP/numPartitions) * eta;
         int WlMin = t / (1 << level) - sqrt(deltaW/numPartitions) * eta;
         int PlMin = opt / (1 << level) - sqrt(deltaP/numPartitions) * eta;
 
-        //cout << "WlMax = " << WlMax << endl;
-        //cout << "PlMax = " << PlMax << endl;
-
         pair<int, int> Wl(WlMin, WlMax);
         pair<int, int> Pl(PlMin, PlMax);
 
         vector<vector<int>> next_level_arrays((1 << level));
-        //cout << "next level array length = " << next_level_arrays.size() << endl;
 
         for (int j = 0; j < (1 << level); ++j) {
-            //cout << "Inside inner for loop, j = " << j;
             vector<int> convolved = maxPlusConv(CCq[2 * j], CCq[2 * j + 1]);
             vector<int> filtered = computeSubarray(convolved, Pl, Wl);
-            
-            //for (const auto& num: filtered){
-                //cout << num << " ";
-            //}
-            
-            //cout << endl;
-            //cout << "convolved length = " << convolved.size() << endl;
-            //cout << "filtered length = " << filtered.size() << endl;
- 
             next_level_arrays[j] = filtered;
         }
-        cout << endl;
 
         // Safely update CCq
         CCq.clear();
@@ -356,49 +287,18 @@ vector<int> Algo1_half(const vector<Item>& items, int t){
     }
 
 
-    cout << "----END MAXCONV----" << endl;
-    
-    cout << "CCq length = " << CCq.size() << endl;
-    cout << "CCq[0] length = " << CCq[0].size() << endl;
     int interval_Tmax = t + sqrt(t * wMax);
     int interval_Tmin = t - sqrt(t * wMax);
 
     int interval_Pmax = opt + sqrt(opt * pMax);
     int interval_Pmin = opt - sqrt(opt * pMax);
 
-    cout << " " << endl;
-    cout << "interval Tmax = " << interval_Tmax << " sqrt part = " << sqrt(t * wMax) <<endl;
-    cout << "interval Tmin = " << interval_Tmin << " sqrt part = " << sqrt(t * wMax)<< endl;
-    cout << "interval Pmax = " << interval_Pmax << " sqrt part = " << sqrt(opt * pMax) <<endl;
-    cout << "interval Pmin = " << interval_Pmin << " sqrt part = " << sqrt(opt * pMax)<< endl;
-
     pair<int, int> interval_T(interval_Tmin,t);
     pair<int, int> interval_P(interval_Pmin, interval_Pmax);
 
-    
-
-    
-    cout << "Convolution: " << endl; 
-    /*
-    for(const auto& num : CCq[0]){
-        cout << num << " ";
-    }
-    */
-
-    cout << "ALGO 1 sol = " << CCq[0].back() << endl;
-    cout << "C0_1 length = " << CCq[0].size() << endl;
 
     CCq[0] = computeSubarray(CCq[0], interval_T, interval_P);
-    for(const auto& num : CCq[0]){
-        cout << num << " ";
-    }
-    cout << endl;
-    cout << "ALGO 1 sol after computing subarray = " << CCq[0].back() << endl;
-    cout << "C0_1 length after computing subarray = " << CCq[0].size() << endl;
     return CCq[0];
-
-    //vector<int> final_opt = computeSubarray(CCq[0], interval_T, interval_P); 
-    //return final_opt;
 }
 
 vector<Item> generateBalancedKnapsackItems(int num_items, int max_profit, int max_weight, int knapsack_capacity) {

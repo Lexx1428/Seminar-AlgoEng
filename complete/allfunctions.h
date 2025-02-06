@@ -25,7 +25,7 @@ vector<int> computeProfitSequence(vector<Item>& group, int capacity);
 
 vector<int> computeSubarray(const std::vector<int> &input, const std::pair<int, int> &indices, const std::pair<int, int> &values);
 
-int computeTildeOPT(int n, double t, vector<Item> items);
+int computeTildeOPT(int t, vector<Item> items);
 
 vector<int> maxPlusConv(const vector<int> &a, const vector<int> &b);
 

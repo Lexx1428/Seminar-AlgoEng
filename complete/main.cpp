@@ -4,7 +4,7 @@
 
 
 int main() {
-    int num_items = 1000;
+    int num_items = 300;
     int max_weight = 30;
     int max_profit = 30;
     int t = 600;
@@ -15,7 +15,7 @@ int main() {
 
     vector<int> opt = Algo1_half(reduced_instance.items, reduced_instance.capacity);
     cout << "Algo 1 solution = " << opt.back() << endl;
-    cout << "OPT tilde = " << computeTildeOPT(reduced_instance.items.size(), reduced_instance.capacity, reduced_instance.items)<< endl;
+    cout << "OPT tilde = " << computeTildeOPT(reduced_instance.capacity, reduced_instance.items)<< endl;
     cout << "Dynamic Programming opt = " << kSack(reduced_instance.capacity, reduced_instance.items) << endl;
 
     return 0;
