@@ -221,27 +221,27 @@ KnapsackInstance reduceToBalanced(const KnapsackInstance& original) {
     return balancedInstance;
 }
 
-vector<int> Algo1_half(const vector<Item>& items, int t){
+vector<int> Algo1(const vector<Item>& items, int t){
     int n = items.size();
-    int wMax = 0, pMax = 0;
-    for (const auto& item : items) {
-        wMax = max(wMax, item.weight);
-        pMax = max(pMax, item.profit);
-    }
+    int wMax = findWmax(items);
+    int pMax = findWmax(items);
 
     int opt = computeTildeOPT(t ,items);
 
+    //Determine number of partitions
     int q = log2(min(t / wMax, opt / pMax));
-    if (q < 0) q = 0; // Ensure q is non-negative
+    if (q < 0) q = 0;
     int numPartitions = 1 << q;
+
     int eta = 17 * log10(n); 
     int deltaW = t * wMax;
     int deltaP = opt * pMax;
 
+    //Split items into 2^q groups uniformly at random
     vector<vector<Item>> groups;
     partitionGroups(items, groups, numPartitions);
 
-
+    //Determine interval for each partition
     int WqMin = t / numPartitions - sqrt(deltaW/numPartitions) * eta;
     int WqMax = t / numPartitions + sqrt(deltaW/numPartitions) * eta;
     int PqMin = opt / numPartitions - sqrt(deltaP/numPartitions) * eta;
@@ -256,14 +256,15 @@ vector<int> Algo1_half(const vector<Item>& items, int t){
     vector<vector<int>> Dq(numPartitions);
     vector<vector<int>> Cq(numPartitions);
     vector<vector<int>> CCq(numPartitions);
-
+    
+    //Compute profit sequence for each partition
     for (int j = 0; j < numPartitions; ++j) {
         Dq[j] = computeProfitSequence(groups[j], WqMax);
         Cq[j] = computeSubarray(Dq[j], wStar, pStar);
         CCq[j] = computeSubarray(Cq[j], Wq, Pq);
     }
 
- 
+    //Compute max-plus convolution in a tree-like fashion 
     for (int level = q - 1; level >= 0; --level) {
         int WlMax = t / (1 << level) + sqrt(deltaW/numPartitions) * eta ;
         int PlMax = opt / (1 << level) + sqrt(deltaP/numPartitions) * eta;
@@ -283,7 +284,7 @@ vector<int> Algo1_half(const vector<Item>& items, int t){
 
         // Safely update CCq
         CCq.clear();
-        CCq = next_level_arrays; // Ensure no unexpected optimizations
+        CCq = next_level_arrays;
     }
 
 

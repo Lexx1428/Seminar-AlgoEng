@@ -40,7 +40,7 @@ vector<Item> generateDataset(const int &numItems, const int &maxWeight, const in
 
 KnapsackInstance reduceToBalanced(const KnapsackInstance& original);
 
-vector<int> Algo1_half(const vector<Item>& items, int t);
+vector<int> Algo1(const vector<Item>& items, int t);
 
 vector<Item> generateBalancedKnapsackItems(int num_items, int max_profit, int max_weight, int knapsack_capacity);
 
